@@ -19,15 +19,46 @@ class parse_movecs:
         self.nsets = f.read_record(dtype='int64') #No.of functions in each set
         self.nbf = f.read_record(dtype='int64') #No. of functions in basis 
         self.nmo = f.read_record(dtype='int64') #No. of vectors in each set
-        self.occ = f.read_record(dtype='float64') #Sequence of occ.-unocc. orbitals
-        self.ksenergies = f.read_record(dtype='float64')
-        mo_vecs = []
-        for i in range(self.nmo[0]):
-            mo_vecs.append(f.read_record(dtype='float64'))
-        self.mo_vecs = np.array(mo_vecs)
-        
-        f.close()  
+        if self.nsets == 1:
+            self.occ_unocc = f.read_record(dtype='float64') #Sequence of occ.-unocc. orbitals
+            occ = 0
+            for i in range(len(self.occ_unocc)):
+                if self.occ_unocc[i] == 2:
+                    occ +=1
+            self.occ = occ #Number of occupied states 
+            self.ksenergies = f.read_record(dtype='float64') #KS energies
+            mo_vecs = []
+            for i in range(self.nmo[0]):
+                mo_vecs.append(f.read_record(dtype='float64'))
+            self.mo_vecs = np.array(mo_vecs)
 
+        elif self.nsets == 2:
+            self.occ_unocc_alpha = f.read_record(dtype='float64') #Sequence of occ.-unocc. orbitals
+            occ_alpha = 0
+            for i in range(len(self.occ_unocc_alpha)):
+                if self.occ_unocc_alpha[i] == 1:
+                    occ_alpha +=1
+            self.occ_alpha = occ_alpha #Number of occupied alpha orbitals
+            self.ksenergies_alpha = f.read_record(dtype='float64') #KS alpha energies
+            mo_vecs_alpha = []
+            for i in range(self.nmo[0]):
+                mo_vecs_alpha.append(f.read_record(dtype='float64'))
+            self.mo_vecs_alpha = np.array(mo_vecs_alpha)
+
+            self.occ_unocc_beta = f.read_record(dtype='float64') #Sequence of occ.-unocc. orbitals
+            occ_beta = 0
+            for i in range(len(self.occ_unocc_beta)):
+                if self.occ_unocc_beta[i] == 1:
+                    occ_beta +=1
+            self.occ_beta = occ_beta #Number of occupied alpha orbitals
+            self.ksenergies_beta = f.read_record(dtype='float64') #KS beta energies
+            mo_vecs_beta = []
+            for i in range(self.nmo[1]):
+                mo_vecs_beta.append(f.read_record(dtype='float64'))
+            self.mo_vecs_beta = np.array(mo_vecs_beta)
+            
+        f.close()
+            
 class parse_civecs:
     
     def __init__(self, filename):
