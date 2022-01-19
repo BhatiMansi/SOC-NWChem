@@ -1,17 +1,13 @@
-import sys 
-import parse_nwchem as pnw
-import nwchem_jobs as nwjob
+import nwchem_run as nwjob
+import recur as soc
 
-input_file = sys.argv[1]
-
-master_dict = pnw.read_soc(input_file)
-print(master_dict)
-
-no_of_processors = master_dict['soc_dict']['np_tddft']
 nwchem_path = '/opt/apps/nwchem/7.0/bin/LINUX64/nwchem'
+fname = 'soc_test.nw'
 
-out_file = nwjob.run_calc(input_file, no_of_processors, nwchem_path)
+nwjob.tddft_run(fname, nwchem_path)
 
-Zeff = 1
+Z, atoms, coord, basis, nsroots, ntroots = nwjob.soc_variables(fname)
+
+soc.soc_print(Z, atoms, coord, basis, nsroots, ntroots, fname)
 
 
