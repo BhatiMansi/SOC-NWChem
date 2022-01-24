@@ -237,9 +237,9 @@ nuc_att_code = {
     'na122': [2,1,2,1,0,0,0,0,1]  
 }
 
-def soc_abC0(a,b,C):
+def soc_abC(a,b,C):
     ''' 
-    Info        : Evaluates m=0 component of SOC integral between two contracted gaussians which 
+    Info        : Evaluates SOC integral between two contracted gaussians which 
                   is sum of nuclear attraction integrals. 
     Parameters  : a  : float - orbital exponent on Gaussian 'a'
                   b  : float - orbital exponent on Gaussian 'b'
@@ -248,11 +248,11 @@ def soc_abC0(a,b,C):
     
     l1,m1,n1 = a.shell 
     l2,m2,n2 = b.shell
-    VabC0 = 0.0 
+    VabC0, VabC1 = 0, 0 
+    part1, part2, part3 = 0,0,0
     
     for ia,ca in enumerate(a.coeffs):
         for ib,cb in enumerate(b.coeffs):
-            part1 = 0
             
             part1 = ((l1*m2*nuc_att(a.alphas[ia],a.shell,a.origin,b.alphas[ib],b.shell,b.origin,C,'na011'))\
                      -(2*a.alphas[ia]*m2*nuc_att(a.alphas[ia],a.shell,a.origin,b.alphas[ib],b.shell,b.origin,C,'na021'))\
@@ -262,41 +262,7 @@ def soc_abC0(a,b,C):
                      +(2*a.alphas[ia]*l2*nuc_att(a.alphas[ia],a.shell,a.origin,b.alphas[ib],b.shell,b.origin,C,'na032'))\
                      +(2*b.alphas[ib]*m1*nuc_att(a.alphas[ia],a.shell,a.origin,b.alphas[ib],b.shell,b.origin,C,'na022'))\
                      -(4*a.alphas[ia]*b.alphas[ib]*nuc_att(a.alphas[ia],a.shell,a.origin,b.alphas[ib],b.shell,b.origin,C,'na042')))
-            
-            VabC0 += a.norm[ia]*b.norm[ib]*ca*cb*part1
-    return VabC0
 
-def soc_ab0(atoms, nbasis, Z, bfn, coord):
-    '''
-    Info  : m=0 component of SOC integral summed over all nuclei 
-    '''
-    natoms = len(atoms)
-    Vab0 = np.zeros([nbasis, nbasis], dtype = 'complex_')
-    for a in range(nbasis):
-        for b in range(a+1,nbasis):
-            for i in range(natoms):
-                Vab0[a,b] += -1j*Z[i]*soc_abC0(bfn[a],bfn[b],coord[i])
-                Vab0[b,a] = -Vab0[a,b]
-                    
-    return Vab0
-
-def soc_abC1(a,b,C):
-    ''' 
-    Info        : Evaluates m=+1 component of SOC integral between two contracted gaussians which 
-                  is sum of nuclear attraction integrals. 
-    Parameters  : a  : float - orbital exponent on Gaussian 'a'
-                  b  : float - orbital exponent on Gaussian 'b'
-                  C  : list - origin of nuclear center
-    '''
-    l1,m1,n1 = a.shell
-    l2,m2,n2 = b.shell
-    VabC1 = 0.0 
-    
-    for ia,ca in enumerate(a.coeffs):
-        for ib,cb in enumerate(b.coeffs):
-            
-            part2 = 0
-            part3 = 0
             part2 = ((m1*n2*nuc_att(a.alphas[ia],a.shell,a.origin,b.alphas[ib],b.shell,b.origin,C,'na051'))\
                      -(2*b.alphas[ib]*m1*nuc_att(a.alphas[ia],a.shell,a.origin,b.alphas[ib],b.shell,b.origin,C,'na061'))\
                      -(2*a.alphas[ia]*n2*nuc_att(a.alphas[ia],a.shell,a.origin,b.alphas[ib],b.shell,b.origin,C,'na071'))\
@@ -314,25 +280,29 @@ def soc_abC1(a,b,C):
                      +(2*b.alphas[ib]*l1*nuc_att(a.alphas[ia],a.shell,a.origin,b.alphas[ib],b.shell,b.origin,C,'na112'))
                      +(2*a.alphas[ia]*n2*nuc_att(a.alphas[ia],a.shell,a.origin,b.alphas[ib],b.shell,b.origin,C,'na102'))\
                      -(4*a.alphas[ia]*b.alphas[ib]*nuc_att(a.alphas[ia],a.shell,a.origin,b.alphas[ib],b.shell,b.origin,C,'na122')))
-
+            
+            VabC0 += a.norm[ia]*b.norm[ib]*ca*cb*part1
             VabC1 += a.norm[ia]*b.norm[ib]*ca*cb*(part2 + (1j*part3))
-            
-            
-    return VabC1
+    
+    return VabC0, VabC1
 
-def soc_ab1(atoms, nbasis, Z, bfn, coord):
+def soc_ab(atoms, nbasis, Z, bfn, coord):
     '''
-    Info  : m=+1 component of SOC integral summed over all nuclei 
+    Info  : SOC integral summed over all nuclei 
     '''
     natoms = len(atoms)
+    Vab0 = np.zeros([nbasis, nbasis], dtype = 'complex_')
     Vab1 = np.zeros([nbasis, nbasis], dtype = 'complex_')
     for a in range(nbasis):
         for b in range(a+1,nbasis):
             for i in range(natoms):
-                Vab1[a,b] += -1j*Z[i]*soc_abC1(bfn[a],bfn[b],coord[i])
+                soc_abC0, soc_abC1 = soc_abC(bfn[a],bfn[b],coord[i])
+                Vab0[a,b] += -1j*Z[i]*soc_abC0
+                Vab0[b,a] = -Vab0[a,b]
+                Vab1[a,b] += -1j*Z[i]*soc_abC1
                 Vab1[b,a] = -Vab1[a,b]
-        
-    return Vab1
+                    
+    return Vab0, Vab1
 
 def ci_vecs(nsroots, ntroots):
     
@@ -403,8 +373,7 @@ def soc_print(Z, atoms, coord, basis, nsroots, ntroots, fname):
     bfn = update_basis_lst(list_bf,coord)
 
     start = time.time()
-    Vabm1 = soc_ab1(atoms, nbasis, Z, bfn, coord)
-    Vabm0 = soc_ab0(atoms, nbasis, Z, bfn, coord)
+    Vabm0, Vabm1 = soc_ab(atoms, nbasis, Z, bfn, coord)
     end = time.time()
     #print('Time taken to compute SOC integral: {}s'.format(end-start))
 
@@ -413,13 +382,9 @@ def soc_print(Z, atoms, coord, basis, nsroots, ntroots, fname):
     movecs = nw_parse.parse_movecs(fname[:-3]+'.movecs')
 
     mo = movecs.mo_vecs
-    occ_arr = movecs.occ
-    occ = 0
-    for i in range(len(occ_arr)):
-        if occ_arr[i] == 2.0:
-            occ +=1
-    unocc = len(occ_arr)- occ
-
+    occ = movecs.occ
+    unocc = len(movecs.occ_unocc) - occ
+    
     soc_mo1 = np.zeros([nbasis,nbasis], dtype = 'complex_')
     soc_mo1 = mo @ Vabm1 @ np.transpose(mo)
     soc_mo0 = np.zeros([nbasis,nbasis], dtype = 'complex_')
