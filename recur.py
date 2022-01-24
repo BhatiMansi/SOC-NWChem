@@ -185,7 +185,6 @@ def nuc_att(a,lmn1,A,b,lmn2,B,C,code):
                   code : string - assigns a code for each nuclear integral obtained 
                          from SOC integral
     '''
-    
     l1,m1,n1 = lmn1 
     l2,m2,n2 = lmn2
     p = a + b
@@ -194,41 +193,49 @@ def nuc_att(a,lmn1,A,b,lmn2,B,C,code):
 
     val = 0.0
     
-    if code == 'na011': x = l1+l2; y = m1+m2; z = n1+n2+1; l1 = l1-1; m2 = m2-1
-    if code == 'na012': x = l1+l2; y = m1+m2; z = n1+n2+1; m1 = m1-1; l2 = l2-1
-    if code == 'na021': x = l1+l2+2; y = m1+m2; z = n1+n2+1; l1 = l1+1; m2 = m2-1
-    if code == 'na022': x = l1+l2+2; y = m1+m2; z = n1+n2+1; m1 = m1-1; l2 = l2+1
-    if code == 'na031': x = l1+l2; y = m1+m2+2; z = n1+n2+1; l1 = l1-1; m2 = m2+1
-    if code == 'na032': x = l1+l2; y = m1+m2+2; z = n1+n2+1; m1 = m1+1; l2 = l2-1
-    if code == 'na041': x = l1+l2+2; y = m1+m2+2; z = n1+n2+1; l1 = l1+1; m2 = m2+1
-    if code == 'na042': x = l1+l2+2; y = m1+m2+2; z = n1+n2+1; m1 = m1+1; l2 = l2+1
-    if code == 'na051': x = l1+l2+1; y = m1+m2; z = n1+n2; m1 = m1-1; n2 = n2-1
-    if code == 'na052': x = l1+l2+1; y = m1+m2; z = n1+n2; n1 = n1-1; m2 = m2-1
-    if code == 'na061': x = l1+l2+1; y = m1+m2; z = n1+n2+2; m1 = m1-1; n2 = n2+1
-    if code == 'na062': x = l1+l2+1; y = m1+m2; z = n1+n2+2; n1 = n1+1; m2 = m2-1
-    if code == 'na071': x = l1+l2+1; y = m1+m2+2; z = n1+n2; m1 = m1+1; n2 = n2-1
-    if code == 'na072': x = l1+l2+1; y = m1+m2+2; z = n1+n2; n1 = n1-1; m2 = m2+1
-    if code == 'na081': x = l1+l2+1; y = m1+m2+2; z = n1+n2+2; m1 = m1+1; n2 = n2+1
-    if code == 'na082': x = l1+l2+1; y = m1+m2+2; z = n1+n2+2; n1 = n1+1; m2 = m2+1
-    if code == 'na091': x = l1+l2; y = m1+m2+1; z = n1+n2; n1 = n1-1; l2 = l2-1
-    if code == 'na092': x = l1+l2; y = m1+m2+1; z = n1+n2; l1 = l1-1; n2 = n2-1
-    if code == 'na101': x = l1+l2+2; y = m1+m2+1; z = n1+n2; n1 = n1-1; l2 = l2+1
-    if code == 'na102': x = l1+l2+2; y = m1+m2+1; z = n1+n2; l1 = l1+1; n2 = n2-1 
-    if code == 'na111': x = l1+l2; y = m1+m2+1; z = n1+n2+2; n1 = n1+1; l2 = l2-1
-    if code == 'na112': x = l1+l2; y = m1+m2+1; z = n1+n2+2; l1 = l1-1; n2 = n2+1
-    if code == 'na121': x = l1+l2+2; y = m1+m2+1; z = n1+n2+2; n1 = n1+1; l2 = l2+1
-    if code == 'na122': x = l1+l2+2; y = m1+m2+1; z = n1+n2+2; l1 = l1+1; n2 = n2+1
+    nuc = nuc_att_code[code]
+    xn = nuc[0]; yn = nuc[1]; zn = nuc[2]
+    l1n = nuc[3]; m1n = nuc[4]; n1n = nuc[5]
+    l2n = nuc[6]; m2n = nuc[7]; n2n = nuc[8]
         
-    for t in range(x):
-        for u in range(y):
-            for v in range(z):
-                val += E(l1,l2,t,A[0]-B[0],a,b) * \
-                       E(m1,m2,u,A[1]-B[1],a,b) * \
-                       E(n1,n2,v,A[2]-B[2],a,b) * \
+    for t in range(l1+l2+xn):
+        for u in range(m1+m2+yn):
+            for v in range(n1+n2+zn):
+                val += E(l1+l1n,l2+l2n,t,A[0]-B[0],a,b) * \
+                       E(m1+m1n,m2+m2n,u,A[1]-B[1],a,b) * \
+                       E(n1+n1n,n2+n2n,v,A[2]-B[2],a,b) * \
                        R(t,u,v,0,p,P[0]-C[0],P[1]-C[1],P[2]-C[2],RPC)
     
     val *= 2*np.pi/p 
+    
     return val
+
+nuc_att_code = {
+    'na011': [0,0,1,-1,0,0,0,-1,0],
+    'na012': [0,0,1,0,-1,0,-1,0,0],
+    'na021': [2,0,1,1,0,0,0,-1,0],
+    'na022': [2,0,1,0,-1,0,1,0,0],
+    'na031': [0,2,1,-1,0,0,0,1,0],
+    'na032': [0,2,1,0,1,0,-1,0,0],
+    'na041': [2,2,1,1,0,0,0,1,0],
+    'na042': [2,2,1,0,1,0,1,0,0],
+    'na051': [1,0,0,0,-1,0,0,0,-1],
+    'na052': [1,0,0,0,0,-1,0,-1,0],
+    'na061': [1,0,2,0,-1,0,0,0,1],
+    'na062': [1,0,2,0,0,1,0,-1,0],
+    'na071': [1,2,0,0,1,0,0,0,-1],
+    'na072': [1,2,0,0,0,-1,0,1,0],
+    'na081': [1,2,2,0,1,0,0,0,1],
+    'na082': [1,2,2,0,0,1,0,1,0],
+    'na091': [0,1,0,0,0,-1,-1,0,0],
+    'na092': [0,1,0,-1,0,0,0,0,-1],
+    'na101': [2,1,0,0,0,-1,1,0,0],
+    'na102': [2,1,0,1,0,0,0,0,-1],
+    'na111': [0,1,2,0,0,1,-1,0,0],
+    'na112': [0,1,2,-1,0,0,0,0,1],
+    'na121': [2,1,2,0,0,1,1,0,0],
+    'na122': [2,1,2,1,0,0,0,0,1]  
+}
 
 def soc_abC0(a,b,C):
     ''' 
@@ -329,67 +336,57 @@ def soc_ab1(atoms, nbasis, Z, bfn, coord):
 
 def ci_vecs(nsroots, ntroots):
     
-    ci_s = civecs_s.XpY_vecs[nsroots-1].reshape(occ,unocc)
-    ci_t = civecs_t.XpY_vecs[ntroots-1].reshape(occ,unocc)
+    ci_s = civecs_s.XpY_vecs[nsroots-1].reshape(occ,unocc) #Singlet CI vectors
+    ci_t = civecs_t.XpY_vecs[ntroots-1].reshape(occ,unocc) #Triplet CI vectors
     norm_s = sum(sum(ci_s*ci_s))
     norm_t = sum(sum(ci_t*ci_t))
-    ci_sn = ci_s/math.sqrt(norm_s)
+    ci_sn = ci_s/math.sqrt(norm_s) #Normalised X+Y CI Vectors
     ci_tn = ci_t/math.sqrt(norm_t)
         
     return ci_sn, ci_tn
 
 def gs_soc(m,ci_t):
-    hso = 0.0
+    '''
+    Computes SOC Matrix elements between ground singlet and excited triplet states.
+    '''
+    hso1, hso2 = 0.0, 0.0
 
-    if m ==0:
-        for j in range(occ):
-            for b in range(occ, occ+unocc):
-                if abs(ci_t[j,b-occ]) > ci_thresh:
-                    hso += ci_t[j,b-occ]*soc_mo0[j,b]
-                    
-        return (abs(hso)*const/math.sqrt(2)) 
-                
-    elif m ==1:
-        for j in range(occ):
-            for b in range(occ, occ+unocc):
-                if abs(ci_t[j,b-occ]) > ci_thresh:
-                    hso += ci_t[j,b-occ]*soc_mo1[j,b]
-        return (abs(hso)*const/2)
+    for j in range(occ):
+        for b in range(occ, occ+unocc):
+            if abs(ci_t[j,b-occ]) > ci_thresh:
+                hso1 += ci_t[j,b-occ]*soc_mo0[j,b]
+                hso2 += ci_t[j,b-occ]*soc_mo1[j,b]
+
+    if m == 0:
+        return(abs(hso1)*const/math.sqrt(2))
+    elif m == 1:
+        return (abs(hso2)*const/2)
+
     
 def es_soc(m, ci_s, ci_t):
-    hso1 = 0.0
-    hso2 = 0.0
-    hso = 0.0
+    '''
+    Computes SOC Matrix elements between excited singlet and triplet states.
+    '''
+    hso3, hso4, hso5, hso6 = 0.0, 0.0, 0.0, 0.0
     
+    for i in range(occ):
+        for j in range(occ):
+            for b in range(occ, occ+unocc):
+                if abs(ci_t[i,b-occ]) > ci_thresh and abs(ci_s[j,b-occ]) > ci_thresh:
+                        hso3 += ci_t[i,b-occ]*ci_s[j,b-occ]*soc_mo1[i,j]
+                        hso5 += ci_t[i,b-occ]*ci_s[j,b-occ]*soc_mo0[i,j]            
+
+    for a in range(occ, occ+unocc):
+        for b in range(occ, occ+unocc):
+            for i in range(occ):
+                if abs(ci_t[i,a-occ]) > ci_thresh and abs(ci_s[i,b-occ]) > ci_thresh:
+                    hso4 += ci_t[i,a-occ]*ci_s[i,b-occ]*soc_mo1[a,b]
+                    hso6 += ci_t[i,a-occ]*ci_s[i,b-occ]*soc_mo0[a,b]
+        
     if m ==1:
-        for i in range(occ):
-            for j in range(occ):
-                for b in range(occ, occ+unocc):
-                    if abs(ci_t[i,b-occ]) > ci_thresh and abs(ci_s[j,b-occ]) > ci_thresh:
-                            hso1 += ci_t[i,b-occ]*ci_s[j,b-occ]*soc_mo1[i,j]           
-
-        for a in range(occ, occ+unocc):
-            for b in range(occ, occ+unocc):
-                for i in range(occ):
-                    if abs(ci_t[i,a-occ]) > ci_thresh and abs(ci_s[i,b-occ]) > ci_thresh:
-                        hso2 += ci_t[i,a-occ]*ci_s[i,b-occ]*soc_mo1[a,b]
-
-        return (abs(hso1 - hso2)*const/(2*math.sqrt(2)))
-    
-    if m ==0:
-        for i in range(occ):
-            for j in range(occ):
-                for b in range(occ, occ+unocc):
-                    if abs(ci_t[i,b-occ]) > ci_thresh and abs(ci_s[j,b-occ]) > ci_thresh:
-                            hso1 += ci_t[i,b-occ]*ci_s[j,b-occ]*soc_mo0[i,j]           
-
-        for a in range(occ, occ+unocc):
-            for b in range(occ, occ+unocc):
-                for i in range(occ):
-                    if abs(ci_t[i,a-occ]) > ci_thresh and abs(ci_s[i,b-occ]) > ci_thresh:
-                        hso2 += ci_t[i,a-occ]*ci_s[i,b-occ]*soc_mo0[a,b]
-
-        return (abs(hso1 - hso2)*const/2) 
+        return (abs(hso3 - hso4)*const/(2*math.sqrt(2)))
+    elif m ==0:
+        return (abs(hso5 - hso6)*const/2) 
     
 def soc_print(Z, atoms, coord, basis, nsroots, ntroots, fname):
 
@@ -409,7 +406,7 @@ def soc_print(Z, atoms, coord, basis, nsroots, ntroots, fname):
     Vabm1 = soc_ab1(atoms, nbasis, Z, bfn, coord)
     Vabm0 = soc_ab0(atoms, nbasis, Z, bfn, coord)
     end = time.time()
-    print('Time taken to compute SOC integral: {}s'.format(end-start))
+    #print('Time taken to compute SOC integral: {}s'.format(end-start))
 
     civecs_t = nw_parse.parse_civecs(fname[:-3]+'.civecs_triplet')
     civecs_s = nw_parse.parse_civecs(fname[:-3]+'.civecs_singlet')
