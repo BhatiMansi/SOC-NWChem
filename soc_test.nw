@@ -1,0 +1,37 @@
+start soc
+echo
+title "fssh"
+memory total 20000 mb
+geometry "opt" units angstroms nocenter noautoz noautosym
+C         -0.131829      -0.000001      -0.000286
+O          1.065288       0.000001       0.000090
+H         -0.718439       0.939705       0.000097
+H         -0.718441      -0.939705       0.000136
+END
+
+BASIS
+* library 6-31G*
+END
+
+DFT
+xc b3lyp
+direct
+end
+
+TDDFT
+nroots 5  	## Number of excited state you want calculate
+singlet  
+triplet		
+civecs
+end
+
+SOC
+nsroots 3 	## Number of singlet roots of interest 
+ntroots 3 	## Number of triplet roots of interest 
+zeff 2		## Method for Zeff calculation
+nproc 8		## Number of processors for tddft calculation 
+END
+
+set geometry "opt"
+TASK DFT ENERGY
+TASK TDDFT ENERGY
