@@ -1,0 +1,43 @@
+start soc
+echo
+title "soc"
+geometry "opt" units angstroms noautoz noautosym
+C         -0.131829      -0.000001      -0.000286
+O          1.065288       0.000001       0.000090
+H         -0.718439       0.939705       0.000097
+H         -0.718441      -0.939705       0.000136
+END
+
+BASIS
+* library 6-31+G**
+END
+
+cosmo
+  solvent acetntrl
+end
+
+DFT
+xc b3lyp
+direct
+end
+
+TDDFT
+nroots 5  	
+rpa
+singlet  
+triplet		
+civecs
+end
+
+SOC
+nsroots 3 	## Number of singlet roots of interest 
+ntroots 3 	## Number of triplet roots of interest 
+zeff 2		## Method for Zeff calculation
+nproc 8		## Number of processors for tddft calculation 
+END
+
+set geometry "opt"
+TASK DFT ENERGY
+TASK TDDFT ENERGY
+
+
