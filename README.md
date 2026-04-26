@@ -15,4 +15,4 @@ In non-relativistic quantum theory, spin is an ad-hoc quantity. However, when pr
 * **Stand-alone Utility:** Designed to be flexible and adaptable to various electronic structure outputs.
 
 ## Implementation Details
-The code is written in **Python**, designed for ease of use and integration into broader molecular dynamics workflows. 
+The code is written in **Python**, designed for ease of use and integration into broader molecular dynamics workflows. For detailed setup and advanced configuration, please refer to Manual.pdf
