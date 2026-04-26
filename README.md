@@ -1,17 +1,22 @@
-Spin-orbit coupling (SOC) arises by the interaction of the magnetic mo-
-ment of the electronic spin angular momentum with the magnetic field in-
-duced by the orbiting motion of the other charges in an atom. The spin-
-orbit couples the electronic states of different spin multiplicities, thus allow-
-ing spin-forbidden excited state processes such as intersystem crossing and
-phosphorescence. Thus including SOC helps us understand the excited-state
-processes in the molecules. In non-relativistic quantum theory, spin is an
-ad hoc quantity. If we include principles of special relativity with quantum
-mechanics, spin arises naturally. However, the calculations involving the
-full relativistic treatment of molecules are computationally expensive. But,
-since the energy contribution due to SOC is small, we can treat SOC as a
-perturbative correction. This allows us to take advantage of existing non-
-relativistic electronic structure packages. We have developed an accurate and
-flexible stand-alone Python code to compute SOC strength between singlet
-and triplets using Linear-Response Time-Dependent Density Functional The-
-ory. We have adapted this SOC calculator to one such electronic structure
-package, NWChem, which currently does not have this functionality.
+#NWChem-SOC Wrapper
+Automated Spin-Orbit Coupling Calculations for NWChem
+This repository provides a standalone Python tool to compute Spin-Orbit Coupling (SOC) strengths between singlet and triplet states. It leverages Linear-Response Time-Dependent Density Functional Theory (LR-TDDFT) to provide perturbative SOC corrections to non-relativistic electronic structure calculations.
+
+#Overview
+Spin-orbit coupling is essential for understanding excited-state processes like intersystem crossing and phosphorescence. While full relativistic treatments are computationally expensive, this tool treats SOC as a perturbative correction, allowing researchers to utilize existing non-relativistic packages.
+
+Key Feature: This code extends NWChem functionality, providing an interface to compute SOC matrix elements—a feature not natively available in the standard NWChem suite.
+
+#Technical Methodology
+Theoretical Basis: Based on the Breit-Pauli Hamiltonian, treating spin as a natural consequence of relativistic quantum mechanics.
+
+Approach: Uses LR-TDDFT to compute SOC strengths between states of different multiplicities.
+
+Implementation: A flexible Python wrapper that parses NWChem outputs and performs the necessary matrix element integrations.
+
+Features
+Stand-alone Utility: Can be adapted to various electronic structure outputs.
+
+Computational Efficiency: Avoids the overhead of full relativistic four-component calculations.
+
+NWChem Integration: Specifically tailored to work with NWChem's transition density and orbital data.
